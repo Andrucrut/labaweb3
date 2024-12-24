@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from Hospital.models import Patient, Doctor, Appointment, Payment, MedicalCard, DoctorSchedule, Cabinet
+from Hospital.models import Patient, Doctor, Appointment, Payment, MedicalCard, DoctorSchedule, Cabinet, \
+    EmploymentPeriod, ServicePayment, Service
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -37,14 +38,34 @@ class MedicalCardSerializer(serializers.ModelSerializer):
         fields = ['patient', 'record_date', 'diagnosis']
 
 
-class DoctorSheduleSerializer(serializers.ModelSerializer):
+class DoctorScheduleSerializer(serializers.ModelSerializer):
     doctor = DoctorSerializer(read_only=True)
     class Meta:
         model = DoctorSchedule
-        fields = ['doctor', 'work_date', 'start_time', "is_working"]
+        fields = ['doctor', 'work_date', 'start_time', 'end_time', 'is_working']
 
 
 class CabinetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cabinet
         fields = '__all__'
+
+
+class ServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = '__all__'
+
+
+class EmploymentPeriodSerializer(serializers.ModelSerializer):
+    doctor = DoctorSerializer(read_only=True)
+    class Meta:
+        model = EmploymentPeriod
+        fields = ['id', 'doctor', 'start_date', 'end_date']
+
+
+class ServicePaymentSerializer(serializers.ModelSerializer):
+    service = ServiceSerializer(read_only=True)
+    class Meta:
+        model = ServicePayment
+        fields = ['id', 'service', 'start_date', 'end_date']

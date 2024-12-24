@@ -33,6 +33,7 @@ class Doctor(models.Model):
     sex = models.CharField(max_length=1, choices=SEX_CHOICES)
     education = models.CharField(max_length=100)
     birth_date = models.DateField()
+    speciality = models.CharField(max_length=100,default="Doctor")
 
     def __str__(self):
         return f"Doctor - {self.first_name} {self.last_name}"
