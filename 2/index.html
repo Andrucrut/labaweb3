@@ -59,6 +59,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#djoser">Djoser</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_4">Аналитические запросы</a>
+    </li>
     </ul>
                   </li>
               </ul>
@@ -234,6 +236,40 @@ http://127.0.0.1:8000/api/auth/token/login
 http://127.0.0.1:8000/api/auth/users/me/
 
 </code></pre>
+<h2 id="_4">Аналитические запросы</h2>
+<ol>
+<li>Вывести по алфавиту список всех пациентов заданного врача с датами и
+стоимостью приемов.</li>
+</ol>
+<p>Запрос  http://localhost:8000/api/doctors/3/appointments/</p>
+<p><img src="1.png" alt="My Image" width="300" height="200"></p>
+<ol>
+<li>Вывести телефоны всех пациентах, которые посещали отоларингологов и
+год рождения которых больше, чем 1987.</li>
+</ol>
+<p>Запрос http://localhost:8000/api/otolaryngologist-patients/</p>
+<p><img src="2.png" alt="My Image" width="300" height="200"></p>
+<ol>
+<li>Вывести список врачей, в графике которых среди рабочих дней имеется
+заданный.</li>
+</ol>
+<p>Запрос http://localhost:8000/api/doctors-with-workday/?date=2024-12-01</p>
+<p><img src="3.png" alt="My Image" width="300" height="200"></p>
+<ol>
+<li>Количество приемов пациентов по датам.</li>
+</ol>
+<p>Запрос http://localhost:8000/api/appointments-count-by-date/?date=2024-12-01</p>
+<p><img src="4.png" alt="My Image" width="300" height="200"></p>
+<ol>
+<li>Вычислить суммарную стоимость лечения пациентов по дням и по врачам.</li>
+</ol>
+<p>Запрос http://localhost:8000/api/total-treatment-cost-by-day-and-doctor/?date=2024-12-01</p>
+<p><img src="5.png" alt="My Image" width="300" height="200"></p>
+<ol>
+<li>Список пациентов, уже оплативших лечение.</li>
+</ol>
+<p>Запрос http://localhost:8000/api/paid-patients/</p>
+<p><img src="6.png" alt="My Image" width="300" height="200"></p>
               
             </div>
           </div><footer>
