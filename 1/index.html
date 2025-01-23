@@ -51,15 +51,17 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#_2">Стек реализации</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#1">Практическое задание 1:</a>
+    <li class="toctree-l2"><a class="reference internal" href="#server">Server</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#2">Практическое задание 2:</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#3">Практическое задание 3:</a>
+    <li class="toctree-l2"><a class="reference internal" href="#client">Client</a>
     </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../2/">Task 2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../3/">Task 2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../4/">Task 2</a>
                   </li>
               </ul>
       </div>
@@ -86,62 +88,445 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="no31">Практическая работа №3.1</h1>
+                <h1 id="1-udp-">Задание 1: UDP Клиент-Сервер</h1>
 <h2 id="_1">Краткое описание задания</h2>
-<p>Цель работы: получить представление о работе с запросами в Django ORM.</p>
+<p>Реализовать клиентскую и серверную часть приложения. Клиент отправляет серверу сообщение «Hello, server», которое должно отображаться на стороне сервера. В ответ сервер отправляет клиенту сообщение «Hello, client», которое отображается у клиента.</p>
 <h2 id="_2">Стек реализации</h2>
 <ul>
 <li>Язык: Python</li>
-<li>фреймворк : Django, DRF</li>
+<li>Библиотека: socket</li>
+<li>Протокол: UDP</li>
 </ul>
-<h2 id="1">Практическое задание 1:</h2>
-<p>Цель задания: Написать запросы на создание в бд</p>
-<pre><code class="language-python">Автовладелец
-owner1 = Owner.objects.create(first_name=&quot;Иван&quot;, last_name=&quot;Иванов&quot;, birth_date=&quot;1980-05-15&quot;)
+<h2 id="server">Server</h2>
+<pre><code class="language-python">import socket
 
-Авто
-car1 = Car.objects.create(state_num=&quot;A123BC77&quot;, brand=&quot;Toyota&quot;, model=&quot;Camry&quot;, color=&quot;Белый&quot;)
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.bind(('', 6061))
 
-Водительское удостоверение
-DriverLicense.objects.create(owner=owner1, license_id=&quot;ID123456&quot;, type=&quot;B&quot;, license_date=date(2010, 5, 15))
-
-Связь
-Ownership.objects.create(owner=owner1, car=car1, start_date=&quot;2020-01-01&quot;)
-
-Для проверки
-print(Ownership.objects.all())
+while True:
+    data, addr = sock.recvfrom(1024)
+    print(data.decode())
+    if not data:
+        break
+    sock.sendto(&quot;Hello, client&quot;.encode(), addr)
 </code></pre>
-<h2 id="2">Практическое задание 2:</h2>
-<p>По созданным в пр.1 данным написать следующие запросы на фильтрацию:</p>
-<pre><code class="language-python">1. toyota_cars = Car.objects.filter(brand=&quot;Toyota&quot;)
-    print(toyota_cars)
-2. drivers_name = Owner.objects.filter(first_name=&quot;Анна&quot;)
-    print(drivers_named_oleg)
-3. random_owner = Owner.objects.first()
-    owner_id = random_owner.id
-    license = DriverLicense.objects.get(owner_id=owner_id)
-    print(license)
-4. owners_of_red_cars = Owner.objects.filter(cars__color=&quot;Красный&quot;).distinct()
-    print(owners_of_red_cars)
-5. owners_with_2010_cars = Owner.objects.filter(ownership__start_date__year=2010).distinct()
-    print(owners_with_2010_cars)
+<h2 id="client">Client</h2>
+<pre><code class="language-python">import socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+
+sock.sendto('Hello, server'.encode(), ('localhost', 6061))
+
+data = sock.recv(1024)
+sock.close()
+
+print(data.decode())
 </code></pre>
-<h2 id="3">Практическое задание 3:</h2>
-<pre><code class="language-python">from django.db.models import Min, Max,Count
-1. oldest_license_date = DriverLicense.objects.aggregate(oldest_date=Min(&quot;license_date&quot;))[&quot;oldest_date&quot;]
-print(f&quot;Самая ранняя дата выдачи водительского удостоверения: {oldest_license_date}&quot;)
-2. latest_ownership_date = Ownership.objects.aggregate(latest_date=Max(&quot;end_date&quot;))[&quot;latest_date&quot;]
-print(f&quot;Самая поздняя дата владения машиной: {latest_ownership_date}&quot;)
-3. cars_per_owner = Owner.objects.annotate(car_count=Count(&quot;cars&quot;)).values(&quot;first_name&quot;, &quot;last_name&quot;, &quot;car_count&quot;)
-for owner in cars_per_owner:
-    print(f&quot;{owner['first_name']} {owner['last_name']} владеет {owner['car_count']} машинами&quot;)
-4. cars_per_brand = Car.objects.values(&quot;brand&quot;).annotate(car_count=Count(&quot;id&quot;)).order_by(&quot;-car_count&quot;)
-for brand in cars_per_brand:
-    print(f&quot;Марка {brand['brand']} имеет {brand['car_count']} машин&quot;)
-5. owners_sorted_by_license_date = Owner.objects.filter(licenses__isnull=False).distinct().order_by(&quot;licenses__license_date&quot;)
-for owner in owners_sorted_by_license_date:
-    print(f&quot;{owner.first_name} {owner.last_name}&quot;)
+<h1 id="2-tcp-">Задание 2: TCP Клиент-Сервер с математической операцией</h1>
+<h2 id="_3">Краткое описание задания</h2>
+<p>Реализовать клиентскую и серверную часть приложения. Клиент запрашивает выполнение математической операции, параметры которой вводятся с клавиатуры. Сервер обрабатывает данные и возвращает результат клиенту.
+Моя задача - Решение квадратного уравнения.</p>
+<h2 id="_4">Стек реализации</h2>
+<ul>
+<li>Язык: Python</li>
+<li>Библиотека: socket</li>
+<li>Протокол: TCP</li>
+</ul>
+<h2 id="server_1">Server</h2>
+<pre><code class="language-python">import math
+import socket
+# TCP
+
+
+def quadraticEquation(a, b, c):
+    D = (b * b - 4 * a * c)
+    if D == 0:
+        x = (-b + math.sqrt(D)) / (2 * a)
+        return x
+    elif D &gt; 0:
+        x1 = (-b - math.sqrt(D)) / (2 * a)
+        x2 = (-b + math.sqrt(D)) / (2 * a)
+        return x1, x2
+    else:
+        return &quot;No solution&quot;
+
+
+serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+serverSocket.bind((&quot;localhost&quot;, 7070))
+serverSocket.listen(1)
+
+while True:
+    client_socket, client_address = serverSocket.accept()
+
+    data = client_socket.recv(1024).decode()
+    a, b, c = map(float, data.split())
+
+    ans = quadraticEquation(a, b, c)
+
+    client_socket.send(str(ans).encode())
+
+    client_socket.close()
 </code></pre>
+<h2 id="client_1">Client</h2>
+<pre><code class="language-python">import socket
+a = float(input())
+b = float(input())
+c = float(input())
+
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((&quot;localhost&quot;, 7070))
+
+client_socket.send(f&quot;{a} {b} {c}&quot;.encode())
+
+
+data = client_socket.recv(1024).decode()
+print(data)
+
+client_socket.close()
+</code></pre>
+<h1 id="3-http-html">Задание 3: HTTP Сервер для выдачи HTML страницы</h1>
+<h2 id="_5">Краткое описание задания</h2>
+<p>Реализовать серверную часть приложения. Клиент подключается к серверу, и в ответ получает HTTP-сообщение, содержащее HTML-страницу, которая сервер подгружает из файла index.html.</p>
+<h2 id="_6">Стек реализации</h2>
+<ul>
+<li>Язык: Python</li>
+<li>Библиотека: socket</li>
+<li>Протокол: HTTP</li>
+</ul>
+<h2 id="server_2">Server</h2>
+<pre><code class="language-python">import socket
+HOST, PORT, max_users = 'localhost', 2021, 5
+
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    with open(&quot;index.html&quot;, &quot;r&quot;) as file:
+        file_content = file.read()
+    s.bind((HOST, PORT))
+    s.listen(max_users)
+    print(f&quot;Сервер запущен на {HOST}:{PORT}&quot;)
+    client_socket, client_address = s.accept()
+    print(f&quot;Клиент подключился: {client_address}&quot;)
+    client_socket.send(b&quot;HTTP/1.1 200 OK\n&quot;)
+    client_socket.send(b&quot;Content-Type: text/html\n&quot;)
+    client_socket.send(b&quot;\n&quot;)
+    client_socket.sendall(file_content.encode('utf-8'))
+    print(&quot;HTML-страница отправлена клиенту&quot;)
+    client_socket.close()
+</code></pre>
+<h2 id="client_2">Client</h2>
+<pre><code class="language-python">import socket
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    HOST, PORT = 'localhost', 2021
+    s.connect((HOST, PORT))
+    data = s.recv(1024)
+    print(&quot;Получено от сервера:&quot;)
+    print(data.decode('utf-8'))
+    s.close()
+</code></pre>
+<h1 id="4">Задание 4: Многопользовательский чат</h1>
+<h2 id="_7">Краткое описание задания</h2>
+<p>Реализовать многопользовательский чат с использованием потоков для обработки сообщений от разных пользователей.</p>
+<h2 id="_8">Стек реализации</h2>
+<ul>
+<li>Язык: Python</li>
+<li>Библиотека: socket,threading</li>
+<li>Протокол: TCP</li>
+</ul>
+<h2 id="server_3">Server</h2>
+<pre><code class="language-python">import socket
+import threading
+
+HOST = 'localhost'
+PORT = 9801
+maxUsers = 10
+
+clients = []
+usernames = {}
+
+
+#send message for all people
+def broadcast(message, sender_socket):
+    for client in clients:
+        if client != sender_socket:
+            try:
+                client.send(message)
+            except:
+                client.close()
+                clients.remove(client)
+
+
+def handler(client_socket):
+    username = client_socket.recv(1024).decode('utf-8')
+    usernames[client_socket] = username
+    welcome_message = f&quot;{username} joined the chat room!&quot;.encode('utf-8')
+    broadcast(welcome_message, client_socket)
+
+    while True:
+        try:
+            message = client_socket.recv(1024)
+            if not message:
+                break
+            if message.decode('utf-8') == &quot;/exit&quot;:
+                print(f&quot;{usernames[client_socket]} disconnected&quot;)
+                clients.remove(client_socket)
+                client_socket.close()
+                broadcast(f&quot;{usernames[client_socket]} exited the chat room&quot;.encode('utf-8'), client_socket)
+                del usernames[client_socket]
+                break
+            else:
+                full_message = f&quot;{usernames[client_socket]}: {message.decode('utf-8')}&quot;.encode('utf-8')
+                broadcast(full_message, client_socket)
+        except:
+            print(f&quot;{usernames[client_socket]} disconnected&quot;)
+            clients.remove(client_socket)
+            client_socket.close()
+            broadcast(f&quot;{usernames[client_socket]} exited the chat room&quot;.encode('utf-8'), client_socket)
+            del usernames[client_socket]
+            break
+
+
+
+def start_server():
+    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    serverSocket.bind((HOST, PORT))
+    serverSocket.listen(maxUsers)
+    print(f&quot;Server started on {HOST}:{PORT}&quot;)
+
+    while True:
+        client_socket, client_address = serverSocket.accept()
+        print(f&quot;Connection from {client_address}&quot;)
+        clients.append(client_socket)
+        thread = threading.Thread(target=handler, args=(client_socket,))
+        thread.start()
+
+
+start_server()
+</code></pre>
+<h2 id="client_3">Client</h2>
+<pre><code class="language-python">import socket
+import threading
+
+HOST = 'localhost'
+PORT = 9801
+
+
+class Client:
+    def __init__(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.serverAddress = ((HOST, PORT))
+        self.username = input(&quot;Enter your username: &quot;)
+
+    def connect(self):
+        try:
+            self.sock.connect(self.serverAddress)
+            print(&quot;Connected to server&quot;)
+            self.sock.send(self.username.encode('utf-8'))
+        except Exception as e:
+            print(f&quot;Error connecting to server: {e}&quot;)
+            return
+
+        send_thread = threading.Thread(target=self.send_messages)
+        send_thread.start()
+
+        receive_thread = threading.Thread(target=self.receive_messages)
+        receive_thread.start()
+
+    def send_messages(self):
+        while True:
+            message = input()
+            if message == '/exit':
+                self.sock.send(message.encode('utf-8'))
+                print(&quot;You have left the chat&quot;)
+                self.sock.close()
+                break
+            try:
+                self.sock.send(message.encode('utf-8'))
+            except:
+                print(&quot;Error sending message, closing connection&quot;)
+                self.sock.close()
+                break
+
+    def receive_messages(self):
+        while True:
+            try:
+                message = self.sock.recv(1024).decode('utf-8')
+                if message:
+                    print(message)
+            except:
+                print(&quot;Error receiving message, closing connection&quot;)
+                self.sock.close()
+                break
+
+
+client = Client()
+client.connect()
+</code></pre>
+<h1 id="5-web-get-post">Задание 5: Web-сервер для обработки GET и POST запросов</h1>
+<h2 id="_9">Краткое описание задания</h2>
+<p>Реализовать веб-сервер, который принимает и записывает информацию о дисциплинах и оценках через POST-запросы и отображает их через GET-запросы.</p>
+<h2 id="_10">Стек реализации</h2>
+<ul>
+<li>Язык: Python</li>
+<li>Библиотека: socket</li>
+<li>Протокол: HTTP</li>
+</ul>
+<h2 id="_11">Листинг</h2>
+<pre><code class="language-python">import socket
+
+MAX_LINE = 64 * 1024
+
+class MyHTTPServer:
+    def __init__(self, host='localhost', port=8081):
+        self.host = host
+        self.port = port
+        self._subjects = {}
+
+    def serve_forever(self):
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.bind((self.host, self.port))
+        server.listen()
+        print(f'Server started on http://{self.host}:{self.port}')
+        while True:
+            conn, _ = server.accept()
+            self.serve_client(conn)
+
+    def serve_client(self, conn):
+        try:
+            req = self.parse_request(conn)
+            resp = self.handle_request(req)
+            self.send_response(conn, resp)
+        except Exception as e:
+            self.send_error(conn, e)
+        finally:
+            conn.close()
+
+    def parse_request(self, conn):
+        rfile = conn.makefile('rb')
+        method, target, _ = self.parse_request_line(rfile)
+        headers = self.parse_headers(rfile)
+        return Request(method, target, headers, rfile)
+
+    def parse_request_line(self, rfile):
+        raw = rfile.readline(MAX_LINE + 1)
+        if len(raw) &gt; MAX_LINE:
+            raise ValueError('Request line too long')
+        req_line = str(raw, 'iso-8859-1').strip()
+        method, target, version = req_line.split()
+        if version != 'HTTP/1.1':
+            raise ValueError('HTTP version not supported')
+        return method, target, version
+
+    def parse_headers(self, rfile):
+        headers = {}
+        while True:
+            line = rfile.readline(MAX_LINE + 1)
+            if not line or line in (b&quot;\r\n&quot;, b&quot;\n&quot;):
+                break
+            header = str(line, 'iso-8859-1').strip()
+            key, value = header.split(': ', 1)
+            headers[key] = value
+        return headers
+
+    def handle_request(self, req):
+        if req.method == 'GET':
+            if req.path == '/':
+                return self.handle_get_subjects()
+            elif req.path.startswith('/subject/'):
+                subject_id = req.path[len('/subject/'):]
+                return self.handle_get_subject_by_id(subject_id)
+        elif req.method == 'POST' and req.path == '/subject':
+            return self.handle_post_subject(req)
+        else:
+            raise ValueError('Unsupported method')
+
+    def handle_post_subject(self, req):
+        content_length = int(req.headers.get('Content-Length', 0))
+        body = req.rfile.read(content_length).decode('iso-8859-1')
+        params = dict(param.split('=') for param in body.split('&amp;'))
+
+
+        if &quot;name&quot; not in params or 'mark' not in params:
+            raise ValueError('The name and mark parameters are required&quot;')
+
+        sub_id = len(self._subjects) + 1
+        self._subjects[sub_id] = {
+            &quot;id&quot;: sub_id,
+            &quot;name&quot;: params.get('name'),
+            &quot;mark&quot;: params.get('mark')
+        }
+        return Response(201, &quot;Created&quot;)
+
+    def handle_get_subjects(self):
+        html = &quot;&lt;html&gt;&lt;head&gt;&lt;title&gt;Subjects&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt;Subjects&lt;/h1&gt;&lt;ul&gt;&quot;
+        for subject in self._subjects.values():
+            html += f&quot;&lt;li&gt;{subject['name']}: {subject['mark']}&lt;/li&gt;&quot;
+        html += &quot;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;&quot;
+        return Response(200, &quot;OK&quot;, headers={&quot;Content-Type&quot;: &quot;text/html&quot;}, body=html)
+
+    def handle_get_subject_by_id(self, subject_id):
+        try:
+            subject_id = int(subject_id)
+            subject = self._subjects.get(subject_id)
+            if not subject:
+                return Response(404, &quot;Not Found&quot;, body=&quot;Subject not found&quot;)
+
+            body = f&quot;Name: {subject['name']}, Mark: {subject['mark']}&quot;
+            return Response(200, &quot;OK&quot;, headers={&quot;Content-Type&quot;: &quot;text/plain&quot;}, body=body)
+
+        except ValueError:
+            return Response(400, &quot;Bad Request&quot;, body=&quot;Invalid subject ID&quot;)
+
+    def send_response(self, conn, resp):
+        status_line = f&quot;HTTP/1.1 {resp.status} {resp.reason}\r\n&quot;
+        conn.sendall(status_line.encode('iso-8859-1'))
+        for header, value in (resp.headers or {}).items():
+            conn.sendall(f&quot;{header}: {value}\r\n&quot;.encode('iso-8859-1'))
+        conn.sendall(b&quot;\r\n&quot;)
+        if resp.body:
+            conn.sendall(resp.body.encode('iso-8859-1'))
+
+    def send_error(self, conn, err):
+        status_code = 500
+        reason = &quot;Internal Server Error&quot;
+        if isinstance(err, ValueError):
+            status_code = 400
+            reason = str(err)
+        elif isinstance(err, Exception):
+            reason = str(err)
+
+        print(f&quot;Error: {err}&quot;)
+
+        status_line = f&quot;HTTP/1.1 {status_code} {reason}\r\n&quot;
+        conn.sendall(status_line.encode('iso-8859-1'))
+        conn.sendall(b&quot;\r\n&quot;)
+        conn.sendall(f&quot;{reason}\r\n&quot;.encode('iso-8859-1'))
+
+
+class Request:
+    def __init__(self, method, target, headers, rfile):
+        self.method = method
+        self.path = target
+        self.headers = headers
+        self.rfile = rfile
+
+
+class Response:
+    def __init__(self, status, reason, headers=None, body=None):
+        self.status = status
+        self.reason = reason
+        self.headers = headers or {}
+        self.body = body
+
+
+if __name__ == '__main__':
+    server = MyHTTPServer()
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print(&quot;Server stopped.&quot;)
+</code></pre>
+<h2 id="_12">Проверка работы</h2>
+<p>для этого отправлю запросы в Postman и посмотрю что выводится на страничке</p>
               
             </div>
           </div><footer>

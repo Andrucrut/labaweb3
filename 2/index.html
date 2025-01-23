@@ -49,19 +49,17 @@
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Task 2</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#_1">Описание моего варианта</a>
+    <li class="toctree-l2"><a class="reference internal" href="#_1">Краткое описание задания</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#_2">Стек реализации</a>
+    <li class="toctree-l2"><a class="reference internal" href="#models">Models</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#serializers">serializers</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#_3">Примеры запросов</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#djoser">Djoser</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#_4">Аналитические запросы</a>
+    <li class="toctree-l2"><a class="reference internal" href="#views">Views</a>
     </li>
     </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../3/">Task 2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../4/">Task 2</a>
                   </li>
               </ul>
       </div>
@@ -88,193 +86,241 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="django-djangorestframework">Реализация серверной части приложения средствами django и djangorestframework в соответствии с заданием из текста работы.</h1>
-<h2 id="_1">Описание моего варианта</h2>
-<p>Задание 10
-Создать программную систему, предназначенную для администратора лечебной
-клиники.
-Прием пациентов ведут несколько врачей различных специализаций. На каждого
-пациента клиники заводится медицинская карта, в которой отражается вся
-информация по личным данным больного и истории его заболеваний (диагнозы). При
-очередном посещении врача в карте отражается дата и время приема, диагноз, текущее
-состояние больного, рекомендации по лечению. Так как прием ведется только на
-коммерческой основе, после очередного посещения пациент должен оплатить
-медицинские услуги (каждый прием оплачивается отдельно). Расчет стоимости
-посещения определяется врачом согласно прейскуранту по клинике.
-Для ведения внутренней отчетности необходима следующая информация о врач:
-фамилия, имя, отчество, специальность, образование, пол, дата рождения и дата начала
-и окончания работы в клинике, данные по трудовому договору. Для каждого врача
-составляется график работы с указанием рабочих и выходных дней.
-Прием пациентов врачи могут вести в разных кабинетах. Каждый кабинет имеет
-определенный режим работы, ответственного и внутренний телефон.
-Перечень возможных запросов к базе данных:
-1. Вывести по алфавиту список всех пациентов заданного врача с датами и
-стоимостью приемов.
-2. Вывести телефоны всех пациентах, которые посещали отоларингологов и
-год рождения которых больше, чем 1987.
-3. Вывести список врачей, в графике которых среди рабочих дней имеется
-заданный.
-4. Количество приемов пациентов по датам.
-5. Вычислить суммарную стоимость лечения пациентов по дням и по врачам.
-6. Список пациентов, уже оплативших лечение.
-Перечень возможных отчетов:</p>
-<ol>
-<li>Отчет о работе врачей в заданный промежуток времени с указанием списка
-принятых пациентов, их диагноза и стоимости услуг с вычислением
-суммарного дохода по каждому врачу.</li>
-</ol>
-<h2 id="_2">Стек реализации</h2>
+                <h1 id="1">Задание 1: Авто.ру</h1>
+<h2 id="_1">Краткое описание задания</h2>
+<p>Сдлелай пункты 2.1,  2.2 , 2.3</p>
+<h2 id="models">Models</h2>
+<pre><code class="language-python">from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.db import models
+
+
+class OwnerManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError(&quot;Users must have an email address.&quot;)
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(&quot;Superuser must have is_staff=True.&quot;)
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(&quot;Superuser must have is_superuser=True.&quot;)
+
+        return self.create_user(email, password, **extra_fields)
+
+
+class Owner(AbstractUser):
+    username = None
+
+    email = models.EmailField(unique=True)
+    last_name = models.CharField(max_length=30, null=False, blank=True)
+    first_name = models.CharField(max_length=30, null=False, blank=True)
+    birth_date = models.DateField(null=False)
+    passport_number = models.CharField(max_length=20, null=False, blank=False, unique=True)
+    home_address = models.CharField(max_length=20, null=False, blank=False)
+    nationality = models.CharField(max_length=20, null=False, blank=False)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['last_name', 'first_name', 'birth_date', 'passport_number', 'home_address', 'nationality']
+
+    objects = OwnerManager()
+
+    def __str__(self):
+        return self.email
+
+
+class Car(models.Model):
+    state_num = models.CharField(max_length=15, null=False, blank=False, unique=True)
+    brand = models.CharField(max_length=20, null=False, blank=False)
+    model = models.CharField(max_length=20, null=False, blank=False)
+    color = models.CharField(max_length=30, null=False, blank=False)
+    owners = models.ManyToManyField(
+        Owner,
+        through=&quot;Ownership&quot;,
+        related_name=&quot;cars&quot;,
+    )
+
+    def __str__(self) -&gt; str:
+        return f&quot;{self.brand} {self.model}&quot;
+
+
+class Ownership(models.Model):
+    owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
+    car = models.ForeignKey(Car, on_delete=models.CASCADE)
+    start_date = models.DateField(null=False, blank=False)
+    end_date = models.DateField(null=True, blank=True)
+
+
+class DriverLicense(models.Model):
+    owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
+    license_id = models.CharField(max_length=10, null=False, blank=False, unique=True)
+    type = models.CharField(max_length=10, null=False, blank=False)
+    license_date = models.DateField(null=True, blank=True)
+</code></pre>
+<p>1) Owner: Пользовательская модель владельца, расширяющая AbstractUser. Она использует email вместо имени пользователя (с полем USERNAME_FIELD). Включает дополнительные поля, такие как фамилия, имя, дата рождения, номер паспорта, адрес и гражданство. Также определены методы для создания пользователя и суперпользователя через OwnerManager.</p>
+<p>2) Car: Модель для автомобилей, включает поля для регистрационного номера, марки, модели и цвета. Связана с моделью владельцев через промежуточную модель Ownership.</p>
+<p>3) Ownership: Промежуточная модель, которая связывает владельцев с их автомобилями и хранит информацию о периоде владения автомобилем (дата начала и окончания).</p>
+<p>4) DriverLicense: Модель для водительских прав владельца с уникальным номером лицензии, типом и датой получения.</p>
+<h2 id="views">Views</h2>
+<pre><code class="language-view">class CarCreateView(CreateView):
+    model = Car
+    fields = [
+        'state_num',
+        'brand',
+        'model',
+        'color'
+    ]
+    template_name = 'add_car.html'
+    success_url = reverse_lazy('car_list')
+
+
+class CarDeleteView(DeleteView):
+    model = Car
+    success_url = reverse_lazy('car_list')
+    template_name = 'delete_car.html'
+
+
+class CarUpdateView(UpdateView):
+    model = Car
+    fields = ['state_num', 'brand', 'model', 'color']
+    template_name = 'car_form.html'
+    success_url = reverse_lazy('car_list')
+
+    def get_object(self, queryset=None):
+        car_id = self.kwargs.get('pk')
+        car = Car.objects.filter(pk=car_id).first()
+        if not car:
+            raise Http404(f&quot;Car with id {car_id} does not exist&quot;)
+        return car
+</code></pre>
+<p>Эти представления обрабатывают создание, удаление и редактирование записей автомобилей в базе данных:</p>
+<ul>
+<li>
+<p>CarCreateView: Обеспечивает создание нового автомобиля. Использует форму с полями для регистрационного номера, марки, модели и цвета, а после успешного создания перенаправляет на список автомобилей (car_list).</p>
+</li>
+<li>
+<p>CarDeleteView: Позволяет удалять автомобиль и после удаления перенаправляет на список автомобилей. Использует шаблон delete_car.html.</p>
+</li>
+<li>
+<p>CarUpdateView: Обеспечивает редактирование данных автомобиля. Если автомобиль с указанным pk не найден, вызывает ошибку Http404.</p>
+</li>
+</ul>
+<h1 id="2">Задание 2: Список отелей</h1>
+<h2 id="_2">Краткое описание задания</h2>
+<p>Необходимо реализовать следующий функционал:
+1) Регистрация новых пользователей.
+2) Просмотр и резервирование номеров. Пользователь должен иметь возможность редактирования и удаления своих резервирований.
+4) Написание отзывов к номерам. При добавлении комментариев, должны
+сохраняться период проживания, текст комментария, рейтинг (1-10),
+информация о комментаторе.
+5) Администратор должен иметь возможность заселить пользователя в отель и
+выселить из отеля средствами Django-admin.
+6) В клиентской части должна формироваться таблица, отображающая
+постояльцев отеля за последний месяц.</p>
+<h2 id="_3">Стек реализации</h2>
 <ul>
 <li>Язык: Python</li>
-<li>фреймворк : Django, DRF</li>
+<li>Программное обеспечение: Python 3.6+, Django 3</li>
 </ul>
-<h2 id="serializers">serializers</h2>
-<pre><code class="language-python">class PatientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Patient
-        fields = ['id', 'first_name', 'last_name', 'birth_date']
+<h2 id="models_1">Models</h2>
+<pre><code class="language-python">class Hotel(models.Model):
+    name = models.CharField(max_length=15, unique=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name=&quot;owner_hotels&quot;)
+    address = models.CharField(max_length=255, blank=True)
+    description = models.TextField(blank=True)
+    favorites = models.ManyToManyField(User, related_name=&quot;favorite_hotels&quot;, blank=True)
 
 
-class DoctorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Doctor
-        fields = '__all__'
+class Room(models.Model):
+    SINGLE = 'Single'
+    DOUBLE = 'Double'
+    SUITE = 'Suite'
+    FAMILY = 'Family'
+
+    ROOM_TYPE_CHOICES = [
+        (SINGLE, 'Одноместный'),
+        (DOUBLE, 'Двухместный'),
+        (SUITE, 'Люкс'),
+        (FAMILY, 'Семейный'),
+    ]
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='room_hotels')
+    type = models.CharField(max_length=15, choices=ROOM_TYPE_CHOICES, default=SINGLE)
+    price = models.DecimalField(max_digits=7, decimal_places=2)
 
 
-class AppointmentSerializer(serializers.ModelSerializer):
-    patient = PatientSerializer(read_only=True)
-    doctor = DoctorSerializer(read_only=True)
-    class Meta:
-        model = Appointment
-        fields = ['id', 'appointment_date', 'appointment_time', 'patient', 'doctor', 'cabinet', 'service']
+class Booking(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name=&quot;bookings&quot;)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name=&quot;bookings&quot;)
+    check_in = models.DateTimeField()
+    check_out = models.DateTimeField()
 
 
-class PaymentSerializer(serializers.ModelSerializer):
-    patient = PatientSerializer(read_only=True)
-    class Meta:
-        model = Payment
-        fields = ['patient', 'service', 'amount', 'payment_date', 'is_paid']
+class Review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name=&quot;reviews&quot;)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name=&quot;reviews&quot;)
+    text = models.TextField()
+    rating = models.DecimalField(max_digits=3, decimal_places=2)
 
 
-class MedicalCardSerializer(serializers.ModelSerializer):
-    patient = PatientSerializer(read_only=True)
-    class Meta:
-        model = MedicalCard
-        fields = ['patient', 'record_date', 'diagnosis']
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name=&quot;profile&quot;)
+    is_owner = models.BooleanField(default=False)
 </code></pre>
-<p>Описание
-PatientSerializer - Используется для работы с данными о пациентах, включая их чтение и сохранение.</p>
-<p>DoctorSerializer - Этот сериализатор подходит для работы с полной информацией о врачах, включая их чтение и сохранение.</p>
-<p>AppointmentSerializer - Используется для работы с записями на прием, включая данные о пациенте и враче.</p>
-<p>PaymentSerializer - Используется для работы с данными об оплатах, включая информацию о пациенте и услугах.</p>
-<p>MedicalCardSerializer - Предназначен для работы с медицинскими картами, включая информацию о диагнозах и пациентах.</p>
-<h2 id="_3">Примеры запросов</h2>
-<pre><code class="language-python">http://127.0.0.1:8000/api/appointments/
-выводит
-[
-  {
-    &quot;id&quot;: 1,
-    &quot;appointment_date&quot;: &quot;2024-12-01&quot;,
-    &quot;appointment_time&quot;: &quot;18:00:00&quot;,
-    &quot;patient&quot;: {
-      &quot;id&quot;: 1,
-      &quot;first_name&quot;: &quot;Andrey&quot;,
-      &quot;last_name&quot;: &quot;Iakynin&quot;,
-      &quot;birth_date&quot;: &quot;2024-12-10&quot;
-    },
-    &quot;doctor&quot;: {
-      &quot;id&quot;: 1,
-      &quot;first_name&quot;: &quot;Kirill&quot;,
-      &quot;last_name&quot;: &quot;Kisikev&quot;,
-      &quot;sex&quot;: &quot;M&quot;,
-      &quot;education&quot;: &quot;Ped&quot;,
-      &quot;birth_date&quot;: &quot;2024-12-10&quot;
-    },
-    &quot;cabinet&quot;: 1,
-    &quot;service&quot;: 1
-  }
-]
+<ul>
+<li>Hotel: Модель отеля с полями для названия, владельца, адреса, описания и списка избранных пользователей.</li>
+<li>oom: Модель комнаты, связанная с отелем, с типом (одноместный, двухместный, люкс, семейный) и ценой.</li>
+<li>Booking: Модель бронирования, которая включает пользователя, комнату, дату заезда и выезда.</li>
+<li>Review: Модель отзыва пользователя о комнате с текстом и оценкой.</li>
+<li>Profile: Модель профиля пользователя, содержащая информацию о том, является ли он владельцем отеля.</li>
+</ul>
+<p>Этот код реализует две функции для авторизации и регистрации пользователей:</p>
+<h2 id="views_1">Views</h2>
+<pre><code class="language-view">def register(request):
+    if request.method == 'POST':
+        user_form = UserRegistrationForm(request.POST)
+        if user_form.is_valid():
+            new_user = user_form.save(commit=False)
+            new_user.set_password(user_form.cleaned_data['password'])
+            new_user.save()
+            return redirect('login')
+    else:
+        user_form = UserRegistrationForm()
+    return render(request, 'account/registration_form.html', {'user_form': user_form})
 
-http://127.0.0.1:8000/api/cabinets/
-выводит
-[
-  {
-    &quot;id&quot;: 1,
-    &quot;number&quot;: &quot;101&quot;
-  }
-]
 
-http://127.0.0.1:8000/api/doctor_schedule/
-выводит
-[
-  {
-    &quot;doctor&quot;: {
-      &quot;id&quot;: 1,
-      &quot;first_name&quot;: &quot;Kirill&quot;,
-      &quot;last_name&quot;: &quot;Kisikev&quot;,
-      &quot;sex&quot;: &quot;M&quot;,
-      &quot;education&quot;: &quot;Ped&quot;,
-      &quot;birth_date&quot;: &quot;2024-12-10&quot;
-    },
-    &quot;work_date&quot;: &quot;2024-12-11&quot;,
-    &quot;start_time&quot;: &quot;14:36:18&quot;,
-    &quot;is_working&quot;: true
-  }
-]
+def user_login(request):
+    if request.method == 'POST':
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            user = authenticate(username=cd['username'], password=cd['password'])
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return redirect('hotel_list')
+                else:
+                    return HttpResponse('Disabled account')
+            else:
+                return HttpResponse('Invalid username or password')
+    else:
+        form = UserLoginForm()
+        return render(request, 'account/login.html', {'form': form})
 </code></pre>
-<h2 id="djoser">Djoser</h2>
-<pre><code class="language-python">метод POST
-создания пользователя 
-http://127.0.0.1:8000/api/auth/users/
-
-Метод POST
-Получение токена
-http://127.0.0.1:8000/api/auth/token/login
-
-Метов GET
-Получение пользователя по токену
-http://127.0.0.1:8000/api/auth/users/me/
-
-</code></pre>
-<h2 id="_4">Аналитические запросы</h2>
-<ol>
-<li>Вывести по алфавиту список всех пациентов заданного врача с датами и
-стоимостью приемов.</li>
-</ol>
-<p>Запрос  http://localhost:8000/api/doctors/3/appointments/</p>
-<p><img alt="Alt text" src="../1.png" /></p>
-<ol>
-<li>Вывести телефоны всех пациентах, которые посещали отоларингологов и
-год рождения которых больше, чем 1987.</li>
-</ol>
-<p>Запрос http://localhost:8000/api/otolaryngologist-patients/</p>
-<p><img alt="Alt text" src="../2.png" /></p>
-<ol>
-<li>Вывести список врачей, в графике которых среди рабочих дней имеется
-заданный.</li>
-</ol>
-<p>Запрос http://localhost:8000/api/doctors-with-workday/?date=2024-12-01</p>
-<p><img alt="Alt text" src="../3.png" /></p>
-<ol>
-<li>Количество приемов пациентов по датам.</li>
-</ol>
-<p>Запрос http://localhost:8000/api/appointments-count-by-date/?date=2024-12-01</p>
-<p><img alt="Alt text" src="../4.png" /></p>
-<ol>
-<li>Вычислить суммарную стоимость лечения пациентов по дням и по врачам.</li>
-</ol>
-<p>Запрос http://localhost:8000/api/total-treatment-cost-by-day-and-doctor/?date=2024-12-01</p>
-<p><img alt="Alt text" src="../5.png" /></p>
-<ol>
-<li>Список пациентов, уже оплативших лечение.</li>
-</ol>
-<p>Запрос http://localhost:8000/api/paid-patients/</p>
-<p><img alt="Alt text" src="../6.png" /></p>
+<p>1) register: Обрабатывает регистрацию нового пользователя. Если форма с данными пользователя корректна, создается новый пользователь, пароль шифруется, и пользователь сохраняется в базе данных. После этого происходит редирект на страницу логина.</p>
+<p>2) user_login: Обрабатывает вход пользователя. При успешной проверке данных (пользователь существует и пароль правильный) происходит вход в систему, и пользователя перенаправляют на страницу списка отелей. В случае неуспешного входа выводится сообщение об ошибке.</p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
         <a href="../1/" class="btn btn-neutral float-left" title="Task 1"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../3/" class="btn btn-neutral float-right" title="Task 2">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -299,6 +345,8 @@ http://127.0.0.1:8000/api/auth/users/me/
     
       <span><a href="../1/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
+    
+      <span><a href="../3/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

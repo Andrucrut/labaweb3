@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Task 2 - WEB-programming</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Task 2";
+        var mkdocs_page_input_path = "3.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> WEB-programming
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">1 lab</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../1/">Task 1</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../2/">Task 2</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Task 2</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_1">Краткое описание задания</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_2">Стек реализации</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1">Практическое задание 1:</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2">Практическое задание 2:</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3">Практическое задание 3:</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../4/">Task 2</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">WEB-programming</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">1 lab</li>
+      <li class="breadcrumb-item active">Task 2</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="no31">Практическая работа №3.1</h1>
+<h2 id="_1">Краткое описание задания</h2>
+<p>Цель работы: получить представление о работе с запросами в Django ORM.</p>
+<h2 id="_2">Стек реализации</h2>
+<ul>
+<li>Язык: Python</li>
+<li>фреймворк : Django, DRF</li>
+</ul>
+<h2 id="1">Практическое задание 1:</h2>
+<p>Цель задания: Написать запросы на создание в бд</p>
+<pre><code class="language-python">Автовладелец
+owner1 = Owner.objects.create(first_name=&quot;Иван&quot;, last_name=&quot;Иванов&quot;, birth_date=&quot;1980-05-15&quot;)
+
+Авто
+car1 = Car.objects.create(state_num=&quot;A123BC77&quot;, brand=&quot;Toyota&quot;, model=&quot;Camry&quot;, color=&quot;Белый&quot;)
+
+Водительское удостоверение
+DriverLicense.objects.create(owner=owner1, license_id=&quot;ID123456&quot;, type=&quot;B&quot;, license_date=date(2010, 5, 15))
+
+Связь
+Ownership.objects.create(owner=owner1, car=car1, start_date=&quot;2020-01-01&quot;)
+
+Для проверки
+print(Ownership.objects.all())
+</code></pre>
+<h2 id="2">Практическое задание 2:</h2>
+<p>По созданным в пр.1 данным написать следующие запросы на фильтрацию:</p>
+<pre><code class="language-python">1. toyota_cars = Car.objects.filter(brand=&quot;Toyota&quot;)
+    print(toyota_cars)
+2. drivers_name = Owner.objects.filter(first_name=&quot;Анна&quot;)
+    print(drivers_named_oleg)
+3. random_owner = Owner.objects.first()
+    owner_id = random_owner.id
+    license = DriverLicense.objects.get(owner_id=owner_id)
+    print(license)
+4. owners_of_red_cars = Owner.objects.filter(cars__color=&quot;Красный&quot;).distinct()
+    print(owners_of_red_cars)
+5. owners_with_2010_cars = Owner.objects.filter(ownership__start_date__year=2010).distinct()
+    print(owners_with_2010_cars)
+</code></pre>
+<h2 id="3">Практическое задание 3:</h2>
+<pre><code class="language-python">from django.db.models import Min, Max,Count
+1. oldest_license_date = DriverLicense.objects.aggregate(oldest_date=Min(&quot;license_date&quot;))[&quot;oldest_date&quot;]
+print(f&quot;Самая ранняя дата выдачи водительского удостоверения: {oldest_license_date}&quot;)
+2. latest_ownership_date = Ownership.objects.aggregate(latest_date=Max(&quot;end_date&quot;))[&quot;latest_date&quot;]
+print(f&quot;Самая поздняя дата владения машиной: {latest_ownership_date}&quot;)
+3. cars_per_owner = Owner.objects.annotate(car_count=Count(&quot;cars&quot;)).values(&quot;first_name&quot;, &quot;last_name&quot;, &quot;car_count&quot;)
+for owner in cars_per_owner:
+    print(f&quot;{owner['first_name']} {owner['last_name']} владеет {owner['car_count']} машинами&quot;)
+4. cars_per_brand = Car.objects.values(&quot;brand&quot;).annotate(car_count=Count(&quot;id&quot;)).order_by(&quot;-car_count&quot;)
+for brand in cars_per_brand:
+    print(f&quot;Марка {brand['brand']} имеет {brand['car_count']} машин&quot;)
+5. owners_sorted_by_license_date = Owner.objects.filter(licenses__isnull=False).distinct().order_by(&quot;licenses__license_date&quot;)
+for owner in owners_sorted_by_license_date:
+    print(f&quot;{owner.first_name} {owner.last_name}&quot;)
+</code></pre>
+<h1 id="django-djangorestframework">Реализация серверной части приложения средствами django и djangorestframework в соответствии с заданием из текста работы.</h1>
+<h2 id="_3">Описание моего варианта</h2>
+<p>Задание 10
+Создать программную систему, предназначенную для администратора лечебной
+клиники.
+Прием пациентов ведут несколько врачей различных специализаций. На каждого
+пациента клиники заводится медицинская карта, в которой отражается вся
+информация по личным данным больного и истории его заболеваний (диагнозы). При
+очередном посещении врача в карте отражается дата и время приема, диагноз, текущее
+состояние больного, рекомендации по лечению. Так как прием ведется только на
+коммерческой основе, после очередного посещения пациент должен оплатить
+медицинские услуги (каждый прием оплачивается отдельно). Расчет стоимости
+посещения определяется врачом согласно прейскуранту по клинике.
+Для ведения внутренней отчетности необходима следующая информация о врач:
+фамилия, имя, отчество, специальность, образование, пол, дата рождения и дата начала
+и окончания работы в клинике, данные по трудовому договору. Для каждого врача
+составляется график работы с указанием рабочих и выходных дней.
+Прием пациентов врачи могут вести в разных кабинетах. Каждый кабинет имеет
+определенный режим работы, ответственного и внутренний телефон.
+Перечень возможных запросов к базе данных:
+1. Вывести по алфавиту список всех пациентов заданного врача с датами и
+стоимостью приемов.
+2. Вывести телефоны всех пациентах, которые посещали отоларингологов и
+год рождения которых больше, чем 1987.
+3. Вывести список врачей, в графике которых среди рабочих дней имеется
+заданный.
+4. Количество приемов пациентов по датам.
+5. Вычислить суммарную стоимость лечения пациентов по дням и по врачам.
+6. Список пациентов, уже оплативших лечение.
+Перечень возможных отчетов:</p>
+<ol>
+<li>Отчет о работе врачей в заданный промежуток времени с указанием списка
+принятых пациентов, их диагноза и стоимости услуг с вычислением
+суммарного дохода по каждому врачу.</li>
+</ol>
+<h2 id="_4">Стек реализации</h2>
+<ul>
+<li>Язык: Python</li>
+<li>фреймворк : Django, DRF</li>
+</ul>
+<h2 id="serializers">serializers</h2>
+<pre><code class="language-python">class PatientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Patient
+        fields = ['id', 'first_name', 'last_name', 'birth_date']
+
+
+class DoctorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Doctor
+        fields = '__all__'
+
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    patient = PatientSerializer(read_only=True)
+    doctor = DoctorSerializer(read_only=True)
+    class Meta:
+        model = Appointment
+        fields = ['id', 'appointment_date', 'appointment_time', 'patient', 'doctor', 'cabinet', 'service']
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    patient = PatientSerializer(read_only=True)
+    class Meta:
+        model = Payment
+        fields = ['patient', 'service', 'amount', 'payment_date', 'is_paid']
+
+
+class MedicalCardSerializer(serializers.ModelSerializer):
+    patient = PatientSerializer(read_only=True)
+    class Meta:
+        model = MedicalCard
+        fields = ['patient', 'record_date', 'diagnosis']
+</code></pre>
+<p>Описание
+PatientSerializer - Используется для работы с данными о пациентах, включая их чтение и сохранение.</p>
+<p>DoctorSerializer - Этот сериализатор подходит для работы с полной информацией о врачах, включая их чтение и сохранение.</p>
+<p>AppointmentSerializer - Используется для работы с записями на прием, включая данные о пациенте и враче.</p>
+<p>PaymentSerializer - Используется для работы с данными об оплатах, включая информацию о пациенте и услугах.</p>
+<p>MedicalCardSerializer - Предназначен для работы с медицинскими картами, включая информацию о диагнозах и пациентах.</p>
+<h2 id="_5">Примеры запросов</h2>
+<pre><code class="language-python">http://127.0.0.1:8000/api/appointments/
+выводит
+[
+  {
+    &quot;id&quot;: 1,
+    &quot;appointment_date&quot;: &quot;2024-12-01&quot;,
+    &quot;appointment_time&quot;: &quot;18:00:00&quot;,
+    &quot;patient&quot;: {
+      &quot;id&quot;: 1,
+      &quot;first_name&quot;: &quot;Andrey&quot;,
+      &quot;last_name&quot;: &quot;Iakynin&quot;,
+      &quot;birth_date&quot;: &quot;2024-12-10&quot;
+    },
+    &quot;doctor&quot;: {
+      &quot;id&quot;: 1,
+      &quot;first_name&quot;: &quot;Kirill&quot;,
+      &quot;last_name&quot;: &quot;Kisikev&quot;,
+      &quot;sex&quot;: &quot;M&quot;,
+      &quot;education&quot;: &quot;Ped&quot;,
+      &quot;birth_date&quot;: &quot;2024-12-10&quot;
+    },
+    &quot;cabinet&quot;: 1,
+    &quot;service&quot;: 1
+  }
+]
+
+http://127.0.0.1:8000/api/cabinets/
+выводит
+[
+  {
+    &quot;id&quot;: 1,
+    &quot;number&quot;: &quot;101&quot;
+  }
+]
+
+http://127.0.0.1:8000/api/doctor_schedule/
+выводит
+[
+  {
+    &quot;doctor&quot;: {
+      &quot;id&quot;: 1,
+      &quot;first_name&quot;: &quot;Kirill&quot;,
+      &quot;last_name&quot;: &quot;Kisikev&quot;,
+      &quot;sex&quot;: &quot;M&quot;,
+      &quot;education&quot;: &quot;Ped&quot;,
+      &quot;birth_date&quot;: &quot;2024-12-10&quot;
+    },
+    &quot;work_date&quot;: &quot;2024-12-11&quot;,
+    &quot;start_time&quot;: &quot;14:36:18&quot;,
+    &quot;is_working&quot;: true
+  }
+]
+</code></pre>
+<h2 id="djoser">Djoser</h2>
+<pre><code class="language-python">метод POST
+создания пользователя 
+http://127.0.0.1:8000/api/auth/users/
+
+Метод POST
+Получение токена
+http://127.0.0.1:8000/api/auth/token/login
+
+Метов GET
+Получение пользователя по токену
+http://127.0.0.1:8000/api/auth/users/me/
+
+</code></pre>
+<h2 id="_6">Аналитические запросы</h2>
+<ol>
+<li>Вывести по алфавиту список всех пациентов заданного врача с датами и
+стоимостью приемов.</li>
+</ol>
+<p>Запрос  http://localhost:8000/api/doctors/3/appointments/</p>
+<p><img alt="Alt text" src="../1.png" /></p>
+<ol>
+<li>Вывести телефоны всех пациентах, которые посещали отоларингологов и
+год рождения которых больше, чем 1987.</li>
+</ol>
+<p>Запрос http://localhost:8000/api/otolaryngologist-patients/</p>
+<p><img alt="Alt text" src="../2.png" /></p>
+<ol>
+<li>Вывести список врачей, в графике которых среди рабочих дней имеется
+заданный.</li>
+</ol>
+<p>Запрос http://localhost:8000/api/doctors-with-workday/?date=2024-12-01</p>
+<p><img alt="Alt text" src="../3.png" /></p>
+<ol>
+<li>Количество приемов пациентов по датам.</li>
+</ol>
+<p>Запрос http://localhost:8000/api/appointments-count-by-date/?date=2024-12-01</p>
+<p><img alt="Alt text" src="../4.png" /></p>
+<ol>
+<li>Вычислить суммарную стоимость лечения пациентов по дням и по врачам.</li>
+</ol>
+<p>Запрос http://localhost:8000/api/total-treatment-cost-by-day-and-doctor/?date=2024-12-01</p>
+<p><img alt="Alt text" src="../5.png" /></p>
+<ol>
+<li>Список пациентов, уже оплативших лечение.</li>
+</ol>
+<p>Запрос http://localhost:8000/api/paid-patients/</p>
+<p><img alt="Alt text" src="../6.png" /></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../2/" class="btn btn-neutral float-left" title="Task 2"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../4/" class="btn btn-neutral float-right" title="Task 2">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../2/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../4/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
